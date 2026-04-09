@@ -24,3 +24,4 @@ val ComposableScope.boxScope: BoxScope?
 
 val ComposableScope.nestedScrollConnection: NestedScrollConnection?
   get() = (this as? UIComposableScope)?.nestedScrollConnection
+

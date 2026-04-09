@@ -8,8 +8,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,7 +28,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import expo.modules.ui.convertibles.resolveAnimatable
@@ -57,7 +57,6 @@ import expo.modules.kotlin.views.ComposableScope
 import expo.modules.ui.convertibles.AlignmentType
 import expo.modules.ui.convertibles.CompositingStrategyType
 import expo.modules.ui.convertibles.GraphicsLayerParams
-import expo.modules.ui.menu.LocalExposedDropdownMenuBoxScope
 
 typealias ModifierType = Map<String, Any?>
 typealias ModifierList = List<ModifierType>
@@ -204,9 +203,8 @@ internal data class ToggleableParams(
   @Field val role: SemanticRoleType? = null
 ) : Record
 
-// Only PRIMARY_NOT_EDITABLE is supported because we don't have a synchronous TextInput.
 internal enum class MenuAnchorType(val value: String) : Enumerable {
-  PRIMARY_NOT_EDITABLE("primaryNotEditable"),
+  PRIMARY_NOT_EDITABLE("primaryNotEditable")
 }
 
 internal data class MenuAnchorParams(
@@ -575,20 +573,17 @@ object ModifierRegistry {
     }
 
     // ExposedDropdownMenuBox scope-dependent modifier
-    register("menuAnchor") { map, _, _, _ ->
-      val scope = LocalExposedDropdownMenuBoxScope.current
-      if (scope != null) {
-        val params = recordFromMap<MenuAnchorParams>(map)
-        with(scope) {
-          Modifier.menuAnchor(
-            type = when (params.type) {
-              MenuAnchorType.PRIMARY_NOT_EDITABLE -> ExposedDropdownMenuAnchorType.PrimaryNotEditable
-            },
-            enabled = params.enabled ?: true
-          )
-        }
-      } else {
-        Modifier
+    register("menuAnchor") { map, scope, _, _ ->
+      val dropdownScope = scope?.exposedDropdownMenuBoxScope
+        ?: error("menuAnchor modifier can only be used inside ExposedDropdownMenuBox")
+      val params = recordFromMap<MenuAnchorParams>(map)
+      with(dropdownScope) {
+        Modifier.menuAnchor(
+          type = when (params.type) {
+            MenuAnchorType.PRIMARY_NOT_EDITABLE -> ExposedDropdownMenuAnchorType.PrimaryNotEditable
+          },
+          enabled = params.enabled ?: true
+        )
       }
     }
   }

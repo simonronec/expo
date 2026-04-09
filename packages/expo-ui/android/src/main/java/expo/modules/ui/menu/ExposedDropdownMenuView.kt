@@ -9,6 +9,7 @@ import expo.modules.kotlin.views.FunctionalComposableScope
 import expo.modules.ui.ModifierList
 import expo.modules.ui.ModifierRegistry
 import expo.modules.ui.composeOrNull
+import expo.modules.ui.exposedDropdownMenuBoxScope
 
 data class ExposedDropdownMenuProps(
   val expanded: Boolean = false,
@@ -22,7 +23,8 @@ fun FunctionalComposableScope.ExposedDropdownMenuContent(
   props: ExposedDropdownMenuProps,
   onDismissRequest: () -> Unit
 ) {
-  val scope = LocalExposedDropdownMenuBoxScope.current ?: return
+  val scope = composableScope.exposedDropdownMenuBoxScope
+    ?: error("ExposedDropdownMenu can only be used inside ExposedDropdownMenuBox")
 
   with(scope) {
     ExposedDropdownMenu(

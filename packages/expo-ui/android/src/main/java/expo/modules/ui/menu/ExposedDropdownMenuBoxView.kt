@@ -3,11 +3,11 @@ package expo.modules.ui.menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import expo.modules.kotlin.views.ComposeProps
 import expo.modules.kotlin.views.FunctionalComposableScope
 import expo.modules.ui.ModifierList
 import expo.modules.ui.ModifierRegistry
+import expo.modules.ui.ExposedDropdownMenuBoxComposableScope
 
 data class ExposedDropdownMenuBoxProps(
   val expanded: Boolean = false,
@@ -25,10 +25,6 @@ fun FunctionalComposableScope.ExposedDropdownMenuBoxContent(
     onExpandedChange = onExpandedChange,
     modifier = ModifierRegistry.applyModifiers(props.modifiers, appContext, composableScope, globalEventDispatcher)
   ) {
-    CompositionLocalProvider(
-      LocalExposedDropdownMenuBoxScope provides this
-    ) {
-      Children(null)
-    }
+    Children(ExposedDropdownMenuBoxComposableScope(this))
   }
 }
